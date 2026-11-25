@@ -1,0 +1,25 @@
+
+workflows:
+  sunusi-ios-27:
+    name: SUNUSI iOS 27 APK
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    scripts:
+      - name: Extract Android project
+        script: |
+          mkdir -p appsrc
+          unzip -o SUNUSI_iOS_27_Source_Project.zip -d appsrc
+
+      - name: Install Gradle
+        script: |
+          curl -L https://services.gradle.org/distributions/gradle-8.7-bin.zip -o gradle.zip
+          unzip -q gradle.zip
+
+      - name: Build SUNUSI APK
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > appsrc/local.properties
+          ./gradle-8.7/bin/gradle -p appsrc assembleDebug
+
+    artifacts:
+      - appsrc/app/build/outputs/apk/debug/*.apk
