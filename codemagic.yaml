@@ -6,20 +6,24 @@ workflows:
     instance_type: mac_mini_m2
 
     scripts:
-      - name: Extract Android project
+      - name: Extract project ZIP
         script: |
-          mkdir -p appsrc
-          unzip -o SUNUSI_iOS_27_Source_Project.zip -d appsrc
+          set -e
+          mkdir -p "$CM_BUILD_DIR/appsrc"
+          unzip -o "$CM_BUILD_DIR/SUNUSI_iOS_27_Source_Project.zip" -d "$CM_BUILD_DIR/appsrc"
 
-      - name: Install Gradle
+      - name: Download Gradle
         script: |
-          curl -L https://services.gradle.org/distributions/gradle-8.7-bin.zip -o gradle.zip
-          unzip -q gradle.zip
+          set -e
+          cd "$CM_BUILD_DIR"
+          curl -fL https://services.gradle.org/distributions/gradle-8.7-bin.zip -o gradle.zip
+          unzip -q -o gradle.zip
 
-      - name: Build SUNUSI APK
+      - name: Build Android APK
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > appsrc/local.properties
-          ./gradle-8.7/bin/gradle -p appsrc assembleDebug
+          set -e
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/appsrc/local.properties"
+          "$CM_BUILD_DIR/gradle-8.7/bin/gradle" -p "$CM_BUILD_DIR/appsrc" assembleDebug
 
     artifacts:
       - appsrc/app/build/outputs/apk/debug/*.apk
